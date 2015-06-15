@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # WordPress Version Scanner
-# v1.1
+# v1.2
 # Scan paths for outdated WordPress installations
 # If MySQLdb available then wp-config.php credentials will be checked for valid installations
 #
@@ -44,6 +44,19 @@ try:
   checksiteurl="yes"
 except:
   checksiteurl="no"
+
+#Override path if cPanel exists,  this reduces scan time to only valid accounts and skips virtfs
+if os.path.exists('/usr/local/cpanel/version'):
+  path=[]
+  for base, dir, files in os.walk("/var/cpanel/users"):
+    for f in files:
+      #Only accept numbers, letters and under score for usernames
+      if re.search("^(\w+)$", f):
+        path.append("/home/"+f+"/public_html")
+
+
+#Sort paths in alphabetical order
+path.sort()
 
 #original function based on wp-upgrade.py by stevenbrown.ca
 def get_latest_wp_version(wp_latest_url="http://wordpress.org/latest.tar.gz"):
